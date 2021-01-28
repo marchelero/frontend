@@ -1,6 +1,6 @@
 <template>
   <v-app id="inspire">
-    <v-navigation-drawer v-model="drawer" app>
+    <v-navigation-drawer v-model="drawer" app >
      <template v-slot:prepend>
         <v-list-item two-line>
           <v-list-item-avatar>

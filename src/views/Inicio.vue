@@ -1,18 +1,30 @@
 <template>
   <v-card class="pa-4">
-    <v-data-table :headers="headers" :items="ejemplo" class="elevation-1">
+    <v-data-table
+      :headers="headers"
+      :items="ejemplo"
+      class="elevation-1"
+      :search="search"
+    >
       <template v-slot:top>
         <v-toolbar flat>
           <v-toolbar-title>Ejemplo CRUD</v-toolbar-title>
           <v-divider class="mx-4" inset vertical></v-divider>
+          <v-text-field
+            v-model="search"
+            append-icon="mdi-magnify"
+            label="Buscar"
+            single-line
+            hide-details
+          ></v-text-field>
           <v-spacer></v-spacer>
+
           <v-dialog v-model="dialog" max-width="500px">
             <template v-slot:activator="{ on, attrs }">
               <v-btn color="primary" dark class="mb-2" v-bind="attrs" v-on="on">
                 Nuevo
               </v-btn>
             </template>
-
             <v-card>
               <v-card-title>
                 <span class="headline">{{ formTitle }}</span>
@@ -20,20 +32,26 @@
 
               <v-card-text>
                 <v-container>
-                  <v-row>
-                    <v-col cols="12" sm="6" md="6">
-                      <v-text-field
-                        v-model="editedItem.nombre"
-                        label="Nombre"
-                      ></v-text-field>
-                    </v-col>
-                    <v-col cols="12" sm="6" md="6">
-                      <v-text-field
-                        v-model="editedItem.detalle"
-                        label="Detalle"
-                      ></v-text-field>
-                    </v-col>
-                  </v-row>
+                  <v-form ref="form">
+                    <v-row>
+                      <v-col cols="12" sm="6" md="6">
+                        <v-text-field
+                          v-model="editedItem.nombre"
+                          label="Nombre"
+                          :rules="[v => !!v || 'El campo es requerido']"
+                          required
+                        ></v-text-field>
+                      </v-col>
+                      <v-col cols="12" sm="6" md="6">
+                        <v-text-field
+                          v-model="editedItem.detalle"
+                          label="Detalle"
+                          :rules="[v => !!v || 'El campo es requerido']"
+                          required
+                        ></v-text-field>
+                      </v-col>
+                    </v-row>
+                  </v-form>
                 </v-container>
               </v-card-text>
 
@@ -48,13 +66,14 @@
               </v-card-actions>
             </v-card>
           </v-dialog>
-          <v-dialog v-model="dialogDelete"   persistent
-      max-width="300">
+          <v-dialog v-model="dialogDelete" persistent max-width="300">
             <v-card>
               <v-card-title class="headline"
                 >Esta seguro que desea borrar este registro?</v-card-title
               >
-              <v-card-text>La accion eliminara el registro por completo.</v-card-text>
+              <v-card-text
+                >La accion eliminara el registro por completo.</v-card-text
+              >
               <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn color="blue darken-1" text @click="closeDelete"
@@ -69,9 +88,13 @@
           </v-dialog>
         </v-toolbar>
       </template>
-      <template v-slot:item.acciones="{ item }">
-        <v-icon color="primary" small class="mr-2" @click="editItem(item)"> mdi-pencil </v-icon>
-        <v-icon color="red" small @click="deleteItem(item)"> mdi-delete </v-icon>
+      <template v-slot:[`item.acciones`]="{ item }">
+        <v-icon color="primary" small class="mr-2" @click="editItem(item)">
+          mdi-pencil
+        </v-icon>
+        <v-icon color="red" small @click="deleteItem(item)">
+          mdi-delete
+        </v-icon>
       </template>
       <template v-slot:no-data>
         <!--  <v-btn color="primary" @click="initialize"> Reset </v-btn> -->
@@ -105,6 +128,7 @@ export default {
   components: {},
   data: () => ({
     ejemplo: [],
+    search: "",
     mdialog: false,
     headers: [
       { text: "Id", sortable: false, value: "id", width: "15%" },
@@ -151,6 +175,7 @@ export default {
           console.error("Error al cargar registros", error);
         });
     },
+    
     showEditDialog(item) {
       this.mdialog = true;
     },
@@ -204,39 +229,39 @@ export default {
 
     save() {
       if (this.editedIndex > -1) {
-        axios
-          .put(
-            Service.getBase() + "datos/" + this.editedItem.id,
-            this.editedItem,
-            Service.getHeader()
-          )
-          .then((response) => {
-            this.toast("success", "Registro actualizado");
-            this.getEjemplo();
-            this.close();
-            //  console.log("Registro actualizado");
-          })
-          .catch((error) => {
-            this.toast("error", "No se pudo actualizar");
-            // console.error("Error al actualizar");
-          });
+        if (this.$refs.form.validate()) {
+          axios
+            .put(
+              Service.getBase() + "datos/" + this.editedItem.id,
+              this.editedItem,
+              Service.getHeader()
+            )
+            .then((response) => {
+              this.toast("success", "Registro actualizado");
+              this.getEjemplo();
+              this.close();
+            })
+            .catch((error) => {
+              this.toast("error", "No se pudo actualizar");
+            });
+        } 
       } else {
-        axios
-          .post(
-            Service.getBase() + "datos",
-            this.editedItem,
-            Service.getHeader()
-          )
-          .then((response) => {
-            //   console.log("Registro guardado");
-            this.toast("success", "Registro guardado");
-            this.getEjemplo();
-            this.close();
-          })
-          .catch((error) => {
-            this.toast("error", "No se pudo guardar");
-            // console.error("Error al guardar");
-          });
+        if (this.$refs.form.validate()) {
+          axios
+            .post(
+              Service.getBase() + "datos",
+              this.editedItem,
+              Service.getHeader()
+            )
+            .then((response) => {
+              this.toast("success", "Registro guardado");
+              this.getEjemplo();
+              this.close();
+            })
+            .catch((error) => {
+              this.toast("error", "No se pudo guardar");
+            });
+        }
       }
     },
     toast(mcolor, mtext) {
