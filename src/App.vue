@@ -81,7 +81,7 @@
             <v-spacer></v-spacer>
             <span class="caption mr-1"><a href="//www.facebook.com/" target="_blank" style="text-decoration: none">Mi Pagina</a></span>
           </v-footer> -->
-      <v-footer padless absolute>
+     <!--  <v-footer padless absolute>
         <v-card color="primary" class="white--text text-center app--footer">
           <v-card-text>
             <v-btn
@@ -111,7 +111,36 @@
             {{ new Date().getFullYear() }} — <strong>Sistema</strong>
           </v-card-text>
         </v-card>
-      </v-footer>
+      </v-footer> -->
+    <v-footer
+    color="primary lighten-1"
+    padless
+    absolute
+  >
+    <v-row
+      justify="center"
+      no-gutters
+    >
+      <v-btn
+        v-for="link in links"
+        :key="link"
+        color="white"
+        text
+        rounded
+        class="my-2"
+      >
+        {{ link }}
+      </v-btn>
+      <v-col
+        class="primary lighten-2 py-4 text-center white--text"
+        cols="12"
+      >
+       <span class="caption"
+              >{{ new Date().getFullYear() }} &copy; Sistemas, Todos los derechos reservados</span
+            >
+      </v-col>
+    </v-row>
+  </v-footer>
     </v-main>
   </v-app>
 </template>
