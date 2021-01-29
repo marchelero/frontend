@@ -155,6 +155,14 @@ export default {
       { title: "Inicio", icon: "mdi-view-dashboard", to: "/" },
       { title: "Acerca", icon: "mdi-help-box", to: "/acerca" },
     ],
+     links: [
+        'Home',
+        'About Us',
+        'Team',
+        'Services',
+        'Blog',
+        'Contact Us',
+      ],
     icons: ["mdi-facebook", "mdi-twitter", "mdi-linkedin", "mdi-instagram"],
   }),
 };
